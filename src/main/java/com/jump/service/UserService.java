@@ -1,11 +1,14 @@
 package com.jump.service;
 
+import java.util.List;
+
+import com.jump.dao.UserDAO;
 import com.jump.dao.UserDAOImpl;
 import com.jump.model.User;
 
 public class UserService {
 	
-	//Business Logic: If userid/pw does not match , deny login
+	UserDAO userDAO = new UserDAOImpl();
 	
 	public static boolean validateLoginCredentials(int userId, String password) {
 		
@@ -23,6 +26,20 @@ public class UserService {
 		
 		
 		return false; 
+		
+	}
+	
+	public boolean checkInvalidUserId(int userId) {
+		
+		List<Integer> users = userDAO.selectAllUsers();
+		
+		for(int i=0;i<users.size(); i++) {
+			if (userId==users.get(i)) {
+				return true;
+			}
+		}
+		
+		return false;
 		
 	}
 	

@@ -23,7 +23,7 @@ public class TransactionDAOImpl implements TransactionDAO{
 			                                            + "\n"
 			                                            + "where rownum <=5 and userid=?\n"
 			                                            + "order by transactionid"	;
-
+	/* ------------------------------------------------------------------------------------------ */
 	@Override
 	public void registerTransaction(Transaction txn) {
 		
@@ -48,6 +48,8 @@ public class TransactionDAOImpl implements TransactionDAO{
 
 		
 	}
+	
+	/* ------------------------------------------------------------------------------------------ */
 	
 	
 	public List<Transaction> displayLastFiveTransactions(int userId) {
@@ -77,7 +79,8 @@ public class TransactionDAOImpl implements TransactionDAO{
 			e.printStackTrace();
 		}
 		return result;
-	} 
+	}
+	/* ------------------------------------------------------------------------------------------ */
 	
 	
 

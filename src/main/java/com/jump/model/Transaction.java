@@ -64,6 +64,16 @@ public class Transaction {
 	public void setTxnType(String txnType) {
 		this.txnType = txnType;
 	}
+
+
+
+
+	@Override
+	public String toString() {
+		return "Transaction [transactionId=" + transactionId + ", userId=" + userId + ", accountId=" + accountId
+				+ ", dateOfTxn=" + dateOfTxn + ", txnType=" + txnType + "]";
+	}
+	
 	
 	
 

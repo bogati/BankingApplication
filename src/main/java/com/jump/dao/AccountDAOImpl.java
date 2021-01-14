@@ -7,9 +7,11 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 
 import com.jump.model.Account;
+import com.jump.model.User;
 import com.jump.util.ConnectionManager;
 
 public class AccountDAOImpl implements AccountDAO{
@@ -23,9 +25,11 @@ public class AccountDAOImpl implements AccountDAO{
 	private static final String SELECT_LAST_INSERTED_ACCOUNTID = "SELECT MAX(accountId) FROM ACCOUNT ";
 	private static final String SELECT_ACCOUNT_BYUSERID = "SELECT * FROM ACCOUNT WHERE USERID=?";
 	private static final String UPDATE_BALANCE = "UPDATE ACCOUNT SET BALANCE = ? WHERE ACCOUNTID=?";
-
+	private static final String SELECT_ALL_ACCOUNTIDS = "SELECT ACCOUNTID FROM ACCOUNT";
+	
+	
+	/* ------------------------------------------------------------------------------------------ */
 	@Override
-	//accountId is unique, hence no need to pass in the userid 
 	public Account selectAccountById(int accountId) {
 		Account acc = null;
 		
@@ -49,6 +53,7 @@ public class AccountDAOImpl implements AccountDAO{
 		return acc;
 			
 	}
+	/* ------------------------------------------------------------------------------------------ */
 
 
 	@Override
@@ -68,13 +73,14 @@ public class AccountDAOImpl implements AccountDAO{
 			//System.out.println ("The Account execution output value is ");
 			
 		} catch (SQLException e) {
-			// TODO Auto-generated catch block
+			
 			e.printStackTrace();
 		}
 		
 		
 		
 	}
+	/* ------------------------------------------------------------------------------------------ */
 
 
 	@Override
@@ -98,32 +104,37 @@ public class AccountDAOImpl implements AccountDAO{
 			
 		
 	}
+	/* ------------------------------------------------------------------------------------------ */
 
 
 	@Override
-	public Account selectAccountByUserId(int userId) {
+	public List<Account> selectAccountsByUserId(int userId) {
 		
-		Account acc = null;
+		List<Account> accounts = new ArrayList<>();
 		ResultSet rs = null;
+		
 		
 		try(PreparedStatement pstmt = conn.prepareStatement(SELECT_ACCOUNT_BYUSERID)){
 			pstmt.setInt(1, userId);
 			rs = pstmt.executeQuery();
 			
-			rs.next();
+			while(rs.next()) {
 			
 			LocalDate localDate = LocalDate.parse( new SimpleDateFormat("yyyy-MM-dd").format(rs.getDate(5)) );
 
-			acc = new Account(rs.getInt(1), rs.getString(2),rs.getInt(3),
-						  rs.getDouble(4),localDate);
+			accounts.add(new Account(rs.getInt(1), rs.getString(2),rs.getInt(3),
+						  rs.getDouble(4),localDate));
+			}
 				
-	} catch (SQLException e) {
+		} catch (SQLException e) {
 		// TODO Auto-generated catch block
 		e.printStackTrace();
-	}
-		return acc;
+		}
+		
+		return accounts;
 		
 	}
+	/* ------------------------------------------------------------------------------------------ */
 
 
 	@Override
@@ -140,6 +151,37 @@ public class AccountDAOImpl implements AccountDAO{
 		// TODO Auto-generated catch block
 		e.printStackTrace();
 	}
+	}
+	/* ------------------------------------------------------------------------------------------ */
+
+
+	@Override
+	public User selectUserByAccountId(int accountId) {
+		
+		return null;
+	}
+
+
+	@Override
+	public List<Integer> selectAllAccounts() {
+		List<Integer> accountsIdsList= new ArrayList<>();
+		ResultSet rs = null;
+		
+		try(PreparedStatement pstmt = conn.prepareStatement(SELECT_ALL_ACCOUNTIDS)){
+			rs = pstmt.executeQuery();
+			while(rs.next()) {
+				accountsIdsList.add(rs.getInt(1));
+				
+			}
+			
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} 
+		
+		
+		
+		return accountsIdsList;
 	}
 	
 

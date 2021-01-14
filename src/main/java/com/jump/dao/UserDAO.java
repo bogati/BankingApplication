@@ -1,5 +1,7 @@
 package com.jump.dao;
 
+import java.util.List;
+
 import com.jump.model.User;
 
 public interface UserDAO {
@@ -11,15 +13,11 @@ public interface UserDAO {
 	public  void insertUser(User user);
 	
 	public int selectLastInsertedUserId();
+
 	
 
 	
-	//select, last 5 transactions 
-	public  void displayLastFiveTransactions();
-	
-	public  void loginToSystem(int userId, String password);
-	
-	public  void logoutFromSystem();
+	public List<Integer> selectAllUsers();
 	
 	
 	

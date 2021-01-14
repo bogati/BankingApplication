@@ -20,13 +20,10 @@ public class BankingConsoleApplication {
 		
 		SpringApplication.run(BankingConsoleApplication.class, args);
 		
-		//------------------------------------------------------------------------------------------//
+		
 		//Get the connection and create tables and add some users on the start of the program 
 		ConnectionManager.getConnection();
 		
-		
-		
-		//------------------------------------------------------------------------------------------//
 		//Display the landing page
 		
 		UserInterface.displayLandingMessage();

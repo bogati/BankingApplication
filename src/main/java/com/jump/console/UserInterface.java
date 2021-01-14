@@ -1,5 +1,6 @@
 package com.jump.console;
 
+import java.io.IOException;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Scanner;
@@ -10,6 +11,7 @@ import com.jump.dao.TransactionDAO;
 import com.jump.dao.TransactionDAOImpl;
 import com.jump.dao.UserDAO;
 import com.jump.dao.UserDAOImpl;
+import com.jump.exception.InvalidUserIdException;
 import com.jump.model.Account;
 import com.jump.model.Transaction;
 import com.jump.model.User;
@@ -27,6 +29,7 @@ public class UserInterface {
 	  static AccountDAO accountDAO = new AccountDAOImpl();
 	  static TransactionDAO transactionDAO = new TransactionDAOImpl();
 	  static AccountService accountService = new AccountService();
+	  static UserService userService = new UserService();
 	 
 	/*
 	public UserInterface() {
@@ -56,6 +59,44 @@ public class UserInterface {
 	  
 	  
 	}
+	/* ------------------------------------------------------------------------------------------ */
+	public static void getUserInput() {
+		int num = scan.nextInt();
+		scan.nextLine();
+		
+		//handle each options provided by the user here 
+		
+		if(num==1) {
+			//create a new account, call create new account function 
+			createNewUser();
+			
+			
+		}
+		else if(num==2) {
+			//login 
+			System.out.println("please enter the user Id : ");
+			
+			int userId = scan.nextInt();
+			scan.nextLine();
+			
+			while(!userService.checkInvalidUserId(userId)) {
+				
+				System.out.println("Invalid userId, please renter the user id ");
+				userId = scan.nextInt();
+				scan.nextLine();
+			}
+			
+				
+			
+			System.out.println("please enter the password : ");
+			String password = scan.nextLine();
+			loginUser(userId, password);
+			
+		}else {
+			// 3 exit 
+			System.out.println("Thank you for visting us ! see you soon !");
+		}
+	}
 	
 	/*------------------------------------------------------------------------------------------*/
 
@@ -71,24 +112,24 @@ public class UserInterface {
 		
 		//userId will be automatically assigned by the system , so grab the userid from the system
 		
-		System.out.println("Customer First Name: \n");
+		System.out.println("Please enter  First Name: \n");
 		String firstName = scan.nextLine();
-		System.out.println("Customer Last Name: \n");
+		System.out.println("Please enter Last Name: \n");
 		String lastName = scan.nextLine();
-		System.out.println("Customer Age: \n");
+		System.out.println("Please enter Age: \n");
 		int age = scan.nextInt();
 		scan.nextLine();
-		System.out.println("Customer Country: \n");
+		System.out.println("Please enter Country: \n");
 		String addrCountry = scan.nextLine();
-		System.out.println("Customer State: \n");
+		System.out.println("Please enter State: \n");
 		String addrState = scan.nextLine();
-		System.out.println("Customer City: \n");
+		System.out.println("Please enter City: \n");
 		String addrCity = scan.nextLine();
-		System.out.println("Customer Phone: please insert a '-' after third and after sixth digit eg. 510-789-7658\n");
+		System.out.println("Please enter Phone: please insert a '-' after third and after sixth digit eg. 510-789-7658\n");
 		String phone = scan.nextLine();
-		System.out.println("Customer email: \n");
+		System.out.println("Please enter email: \n");
 		String email = scan.nextLine();
-		System.out.println("Customer Account password: \n");
+		System.out.println("Please enter Account password , please ensure it is of 8 characters Lowercase, Uppercase and a special character: \n");
 		String password = scan.nextLine();
 		
 		//once you have all the user details, persist the user in the database 
@@ -116,7 +157,7 @@ public class UserInterface {
 		System.out.println("\nYou MUST fill out the following information for bank account creation ");
 		
 		//accountId will be assigned automatically 
-		System.out.println("Account Type : for ex Savings, Checkings etc");
+		System.out.println("Please enter the type of Account you wish to create such as Savings, Checkings, Credit etc");
 		String accountName = scan.nextLine();
 		System.out.println("\nAccount Balance: ");
 		Double balance = scan.nextDouble();
@@ -142,6 +183,36 @@ public class UserInterface {
 		
 		
 	}
+
+	/* ------------------------------------------------------------------------------------------ */
+
+	
+	public static void loginUser(int userId, String password) {
+		
+		//log the user in 
+		UserService userService = new UserService();
+		while(userService.validateLoginCredentials(userId, password)==false) {
+			System.out.println("Invalid Credentials , please try again! ");
+			
+			System.out.println("please re-enter the user Id : ");
+			userId = scan.nextInt();
+				
+			
+			
+			scan.nextLine();
+			System.out.println("please re-enter the password : ");
+			password = scan.nextLine();
+		}
+		
+		
+			//log the user in and display the login welcome message 
+			//System.out.println("user login successful !");
+			displayWelcomeAfterLogin(userId);
+			
+			
+		
+	}
+	
 	
 	/* ------------------------------------------------------------------------------------------ */
 	public  static void displayWelcomeAfterLogin(int userId) {
@@ -166,70 +237,91 @@ public class UserInterface {
 		 
 			
 	}
-	/* ------------------------------------------------------------------------------------------ */
 
 	
-	public static void loginUser(int userId, String password) {
+	/* ------------------------------------------------------------------------------------------ */
+	
+	public static void displayUserInformation(int userId) {
+		//get the account using the userId
+		List<Account> accounts = accountDAO.selectAccountsByUserId(userId);
 		
-		//log the user in 
-		UserService userService = new UserService();
-		while(userService.validateLoginCredentials(userId, password)==false) {
-			System.out.println("Invalid Credentials , please try again! ");
-			
-			System.out.println("please enter the user Id : ");
-			userId = scan.nextInt();
-			scan.nextLine();
-			System.out.println("please enter the password : ");
-			password = scan.nextLine();
+		//get the user using the accountId
+		User user = userDAO.selectUserById(userId);
+		
+		//tell, how many accounts and their names and balances in each ,display user name and everything 
+		System.out.println("\nPlease Find your detailed information below \n");
+		System.out.println(user.toString());
+		
+		System.out.println("\nFollowing is the information on your Accounts: \n");
+		
+		for(int i=0; i<accounts.size(); i++) {
+			System.out.println(accounts.get(i).toString());
 		}
 		
-		
-			//log the user in and display the login welcome message 
-			//System.out.println("user login successful !");
-			displayWelcomeAfterLogin(userId);
-			
-			
-		
-	}
-	//------------------------------------------------------------------------------------------//
-
-	
-	//once user is logged in , show the welcome message !
-	
-	public  void welcomeUserMessage() {
-		
 	}
 	
-	
-	//------------------------------------------------------------------------------------------//
-	public static void getUserInput() {
-		int num = scan.nextInt();
+	public static void transferFunds(int userId) {
+		List<Account> accounts = accountDAO.selectAccountsByUserId(userId);
+		System.out.println("\nFollowing is the information on your Accounts: \n");
+		
+		for(int i=0; i<accounts.size(); i++) {
+			System.out.println(accounts.get(i).toString()+"\n");
+		}
+		
+		System.out.println("Please enter the accountId you wish the fund to transfer from : \n");
+		int accountId = scan.nextInt();
 		scan.nextLine();
 		
-		//handle each options provided by the user here 
-		
-		if(num==1) {
-			//create a new account, call create new account function 
-			createNewUser();
+		while(!accountService.checkInvalidAccountId(accountId)) {
 			
-			
-		}
-		else if(num==2) {
-			//login 
-			System.out.println("please enter the user Id : ");
-			int userId = scan.nextInt();
+			System.out.println("Invalid accountId, please renter the account id ");
+			accountId = scan.nextInt();
 			scan.nextLine();
-			System.out.println("please enter the password : ");
-			String password = scan.nextLine();
-			loginUser(userId, password);
-			
-		}else {
-			// 3 exit 
-			System.out.println("Thank you for visting us ! see you soon !");
 		}
+		
+		System.out.println("\nplease enter the amount you wish to withdraw/transfer: ");
+		double amount = scan.nextDouble();
+		scan.nextLine();
+		
+		
+		boolean transferSuccess = accountService.withdrawMoney(amount,accountId,userId);
+		
+		while(!transferSuccess)
+		{
+			System.out.println("\nplease re-enter the amount you wish to withdraw/transfer: ");
+			amount = scan.nextDouble();
+			scan.nextLine();
+			transferSuccess = accountService.withdrawMoney(amount,accountId,userId);
+			
+			
+		}
+		
+		System.out.println("\nPlease enter the accountId you wish the fund to transfer to : \n");
+		int accountId2 = scan.nextInt();
+		scan.nextLine();
+		
+		while(!accountService.checkInvalidAccountId(accountId2)) {
+			
+			System.out.println("Invalid accountId, please renter the account id ");
+			accountId2 = scan.nextInt();
+			scan.nextLine();
+		}
+		
+		//select the userID by USING accountId information
+		Account accOfReceivingUser = accountDAO.selectAccountById(accountId2);
+		
+		accountService.depositMoney(amount,accountId2,accOfReceivingUser.getUserId());
+		
+		System.out.println("\n Following is the information on your Accounts after Transfer: \n");
+		List<Account> accounts2 = accountDAO.selectAccountsByUserId(userId);
+		
+		for(int i=0; i<accounts2.size(); i++) {
+			System.out.println(accounts2.get(i).toString()+"\n");
+		}	
+		
 	}
 	
-	//------------------------------------------------------------------------------------------//
+	/* ------------------------------------------------------------------------------------------ */
 	
 	//TEST CASES LATER 
 	
@@ -240,13 +332,9 @@ public class UserInterface {
 		 
 		 while(choice != 7) {
 			 
-		if(choice ==7) {
-			System.out.println("You are logged out now !");
-			displayLandingMessage();
-			
-		}
+
 		 
-		else if(choice==1) {
+		if(choice==1) {
 			 //deposit 
 			 System.out.println("\n please enter accountId to which you wish to deposit the amount : \n");
 			 int accountId = scan.nextInt();
@@ -266,7 +354,7 @@ public class UserInterface {
 			 
 		 }
 		 else if (choice==2) {
-			 //deposit 
+			 //withdraw
 			 System.out.println("\n please enter accountId to which you wish to withdraw the amount from : \n");
 			 int accountId = scan.nextInt();
 			 scan.nextLine();
@@ -274,7 +362,15 @@ public class UserInterface {
 			 double amount = scan.nextDouble();
 			 scan.nextLine();
 			 
-			 accountService.withdrawMoney(amount,accountId,userId);
+			 boolean withdrawSuccess = accountService.withdrawMoney(amount,accountId,userId);
+			 
+			 while(!withdrawSuccess) {
+				 System.out.println("\nplease re-enter the amount you wish to withdraw: ");
+				 amount = scan.nextDouble();
+				 scan.nextLine();
+				 withdrawSuccess = accountService.withdrawMoney(amount,accountId,userId);
+				 
+			 }
 				
 			 
 			 
@@ -284,6 +380,7 @@ public class UserInterface {
 		
 		 else if(choice==3) {
 			 //Funds transfer
+			 transferFunds(userId);
 			 
 		 }
 		 
@@ -292,13 +389,11 @@ public class UserInterface {
 		 
 		 else if(choice==4) {
 			 List<Transaction> transactions = transactionDAO.displayLastFiveTransactions(userId);
-			 System.out.println("Following are your last five Transactions");
-			 System.out.println("Transaction Id | User Id | Account Id | Date Of Transaction | Transaction Type \n" );
+			 System.out.println("Following are your most recent Transactions");
+			
 			 for(int i=0 ; i<transactions.size();i++ ) {
+				 System.out.println(transactions.get(i).toString()+"\n");
 				 
-				 System.out.println(transactions.get(i).getTransactionId()+"              |  "+
-						 			"  "+transactions.get(i).getUserId()+"   |   "+transactions.get(i).getAccountId()+ " "+
-						 			"             |  " + transactions.get(i).getDateOfTxn()+"        |"+transactions.get(i).getTxnType());
 				 
 			 }
 			 
@@ -306,20 +401,22 @@ public class UserInterface {
 		 }
 		
 		 else if (choice==5) {
-			 //display the customer information
+			 displayUserInformation(userId);
 		 }
 		 else if (choice==6) {
+			 //the second arg 1 tells that this is the additional account not the first one 
 			 createBankAccount(userId,1);
 			 
 		 }
 		 
-		 System.out.println("Please make another choice of services you wish to use (your options are : 1,2,3,4,5,6 or 7)");
+		 
+		 System.out.println("\nPlease make another choice of services you wish to use (your options are : 1,2,3,4,5,6 or 7)");
 		 choice = scan.nextInt(); 
 		 scan.nextLine();
 		 
 		}
 		
-		 
+		 System.out.println("Thank you for visiting today ! You are logged out now !");
 		 displayLandingMessage();
 		 
 		 

@@ -2,10 +2,14 @@ package com.jump.dao;
 
 import com.jump.model.User;
 import com.jump.util.ConnectionManager;
+
+import java.io.IOException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 
 
 public class UserDAOImpl implements UserDAO{
@@ -27,6 +31,7 @@ public class UserDAOImpl implements UserDAO{
 	private static final String SELECT_USERBYID= "SELECT * FROM USER WHERE USERID = ?";//is null 
 	private static final String INSERT_USER = "INSERT INTO USER VALUES (null,?,?,?,?,?,?,?,?,?) ";
 	private static final String SELECT_LAST_INSERTED_USER = "SELECT MAX(userId) FROM USER ";
+	private static final String SELECT_ALL_USERIDS = "SELECT USERID FROM USER";
 	
 
 	@Override
@@ -74,7 +79,6 @@ public class UserDAOImpl implements UserDAO{
 			
 			pstmt.executeUpdate();
 			
-			System.out.println ("The user insert execution output value is ");
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -103,26 +107,7 @@ public class UserDAOImpl implements UserDAO{
 		
 	}
 
-	
 
-	@Override
-	public void displayLastFiveTransactions() {
-		
-		
-	}
-	
-	@Override
-	public void loginToSystem(int userId, String password) {
-		// TODO Auto-generated method stub
-		
-	}
-
-
-	@Override
-	public void logoutFromSystem() {
-		
-		
-	}
 	
 	//for the purpose of testing the functions 
 	
@@ -130,6 +115,27 @@ public class UserDAOImpl implements UserDAO{
 		UserDAO userDAO = new UserDAOImpl();
 		System.out.println(userDAO.selectLastInsertedUserId());
 		
+	}
+	@Override
+	public List<Integer> selectAllUsers() {
+		List<Integer> usersIdsList= new ArrayList<>();
+		ResultSet rs = null;
+		
+		try(PreparedStatement pstmt = conn.prepareStatement(SELECT_ALL_USERIDS)){
+			rs = pstmt.executeQuery();
+			while(rs.next()) {
+				usersIdsList.add(rs.getInt(1));
+				
+			}
+			
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} 
+		
+		
+		
+		return usersIdsList;
 	}
 
 
