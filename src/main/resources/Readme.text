@@ -1,0 +1,116 @@
+DOCUMENTATION OF THE APPLICATION 
+
+
+
+PROCESSES INVOLVED 
+
+1:REQUIREMENTS GATHERING 
+	 Project Name: DollarsBankCoreJavaAppVl
+	 Domain : Banking {Internet Banking)
+	 Application Type : Console Application
+	 Architecture Used : Layered Architecture
+	 User Interface(UI) : Menu based with multicolor
+	 
+	 
+2:DESIGIN PHASE
+	Architecture : tiered (3-layered)
+	Presentation layer (achieved through Spring MVC i.e having model package for M, console package for V, controller package for C)
+	Business logic layer (achieved through bundling business logic in service package)
+	Data access layer (DAO for JDBC or repository in JPA , package's name : "dao","repository") 
+	
+	Database used : H2 database (in-memory database)
+	Dependencies used : <groupId>org.springframework.boot</groupId>
+					    <artifactId>spring-boot-starter-web</artifactId>
+					    
+					    <groupId>com.h2database</groupId>
+						<artifactId>h2</artifactId>
+	Bonus: use JDBC and DAO to connect user info to a database ( create a ConnectionManager class to allow connection of java program to h2 database)
+	
+	Database Design : ER diagram 
+	
+	RESOURCES:
+	https://www.tutorialspoint.com/h2_database/h2_database_jdbc_connection.htm
+	https://www.baeldung.com/spring-boot-h2-database
+	https://www.guru99.com/er-diagram-tutorial-dbms.html
+	https://www.tutorialspoint.com/h2_database/h2_database_insert.htm
+	 
+	For init data.sql
+	http://www.h2database.com/html/features.html?highlight=init&search=init#firstFound
+	
+	For Scanner:
+	https://stackoverflow.com/questions/13102045/scanner-is-skipping-nextline-after-using-next-or-nextfoo
+	
+	For unresolved issues:
+	https://www.tutorialspoint.com/design_pattern/data_access_object_pattern.htm
+	
+	SQL date Format: YYYY-MM-DD
+	https://www.w3schools.com/sql/sql_datatypes.asp 
+					   
+					   
+	
+	
+	
+3:IMPLEMENTATION
+	
+	ConnectionManager has all the code related to the database logins and properties file does not hold these data
+	
+	There are two ways to create tables in the database on the start of the program:
+	1.using data.sql and put it in the target(resources folder) that the JVM automatically loads 
+	2.call the functions in the main class from appropriate classes that allows to create / insert the data in the respective tables
+	
+	Entities : User, Account, Transaction 
+	
+	Functionalities for the User:
+	Allow user to make:
+		a. Deposit
+		b. Withdrawal
+		c. Funds Transfer
+		d. 5 recent transaction history
+		e. Display customer information
+		f. Sign out
+	Apply business logic to handle illegal
+	operations in:
+		a. login system (ensuring the username and password for the user matches against the database)
+		b. Transactions (withdrawls /
+		depsosits, etc.) => ensuring you subtract the amount withdrawal and add the deposits
+		
+	How to track the transactions of each User/Customer:
+	Each transaction is either withdrawal, deposit 
+	If user choose to withdraw, deposit, insert into the transaction 
+	
+LESSONS LEARNED:
+The value of overall architecture and designing each class, each function in details 
+Design first , code later, code one function at a time after you are done with setting up the architecture
+Dividing the problem into smaller ones and then solving the larger problem
+
+HANDY CODES :
+		java.time.LocalDateTime , java.util.Date , java.sql.Date 
+		
+		1.Convert LocalDate from java.time.LocalDateTime to Date from java.sql.Date 
+		Date date = java.sql.Date.valueOf(account.getDateCreated()); (where account.getDateCreated() is in the LocalDate format) 
+		(https://stackoverflow.com/questions/22929237/convert-java-time-localdate-into-java-util-date-type/22929420)
+		
+		2.Convert SQL Date (java.sql.date) to LocalDate 
+		LocalDate localDate = LocalDate.parse( new SimpleDateFormat("yyyy-MM-dd").format(rs.getDate(5)) );
+		(where the rs.getDate(5) returns the date with the format in SQL date 
+  
+UNRESOLVED ISSUES 
+How do I call DAO functions(through interface (cant create an object so cant call the method ! , make daoimpl obj and call function ? then what is 
+the point of interface ? ) ====? resolved : UserDAO userDao = new UserDAOImpl(); //userDao is just a reference variable to the UserDAOImpl object
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
